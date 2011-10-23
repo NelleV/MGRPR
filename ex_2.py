@@ -5,6 +5,8 @@
 
 import numpy as np
 import pylab as pl
+
+from classification import logistic_regression
 from utils import load_data
 
 verbose = True
@@ -30,11 +32,14 @@ for iter in range(max_iter):
             print "got out at iteration", iter
         break
 
+u = (Y - np.dot(X, theta)).mean()
+
+beta, u = logistic_regression(X, Y)
 # Calculate the line p(y = 1|x) = 0.5
 
 
 # Plot
-fig = pl.figure()
+fig = pl.figure(1)
 colors = ['#4EACC5', '#FF9C34', '#4E9A06']
 my_members = Y == 0
 my_members.shape = (my_members.shape[0])
@@ -47,9 +52,9 @@ my_members.shape = (my_members.shape[0])
 ax.plot(X[my_members, 0], X[my_members, 1],
         'w', markerfacecolor=colors[1], marker = '.')
 
-x_theta = [[i] for i in np.linspace(X.min(), X.max(), 100)]
-y_theta = 0.5 / theta[0] + np.linspace(X.min(), X.max(), 100) * 0.5 / theta[1]
-ax.plot(x_theta, y_theta, color=colors[2], linewidth=1)
+x_beta = [[i] for i in np.linspace(X.min(), X.max(), 100)]
+y_beta =  (0.5 - u - beta[0] * np.linspace(X.min(), X.max(), 100)) * 1 / beta[1]
+ax.plot(x_beta, y_beta, color=colors[2], linewidth=1)
 pl.show()
 
 
