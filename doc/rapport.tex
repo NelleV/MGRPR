@@ -125,6 +125,7 @@ avec $N_{mk} = \#\{k|\delta_j^{(k)} = 1 | z = m\}$
 
 \section{Classification linéaire}
 
+\subsection{Modèle LDA}
 A REDIGER
 
 $l(\theta) = log(\prod_{n=1}^N p (y_n | \pi) \prod_{j=1}^m p(x_{j, n}|y_n, \theta_j)$
@@ -171,5 +172,67 @@ c = - \frac{1}{2}\sum_{j=1}^{n} (1 - y_j)\tr(\Sigma^{-1} (x_i - \mu_0)(x_i - \mu
 DEMONSTRATION A FINIR
 
 $\mu_1 = \frac{1}{n} \sum_{i=1}^{N_j}x_i$
+
+\subsection{Comparaison des trois modèles}
+
+
+\begin{tabular}{| c | l | l | l |}
+          & LDA & Régression Logistique & Régression Linéaire \\
+A         & 0.216667 & \textbf{0.16}    & \textbf{0.16}      \\
+B         & 0.126667 & 0.1     & \textbf{0.08333}   \\
+C         & 0.155    & \textbf{0.12}    & 0.16       \\
+\end{tabular}
+
+
+\includegraphics[width=300px]{classificationA1.png}
+
+
+\paragraph{Jeu de données A}
+
+Le barycentre des données est équidistant des nuages de points $Y = 0$ et $Y =
+1$, ce qui explique la bonne performance de la régression linéaire.
+
+Entre LDA et IRLS, la pente des droites est très proche, mais la constante
+varie. IRLS est une méthode d'approximation itérative, qui suit le même
+principe que LMS (least mean square), qui converge très bien pour la
+régression linéaire. Comme cette dernière est très efficace ici, il n'est donc
+pas surprenant qu'IRLS marche si bien sur ces données.
+
+On peut supposer que si il y a un biais dans les données, il sera plus
+facilement corrigé par un algorithme itératif (IRLS) que par un calcul direct
+(LDA). Cela peut expliquer le plus faible taux d'erreur pour IRLS que pour
+LDA.
+
+
+\includegraphics[width=300px]{classificationB1.png}
+
+
+\paragraph{Jeu de tests B}
+
+La régression linéaire fonctionne très bien sur ce jeu de données, car les
+points tels que $Y = 1$ sont visuellement proches d'une droite, qui est elle
+même orthogonal à la moyenne des vecteurs pour $Y = 0$. Ainsi il semble
+réaliste de trouver un vecteur $\theta$ tel que pour le point X tel que $Y = 1$,
+$\theta X = 1$, et dans l'autre cas $\theta X = 0$
+
+On remarque que les deux autres méthodes sont aussi relativement bonnes. Ce
+n'est pas surprenant, les données étant visuellement séparées.
+
+\includegraphics[width=300px]{classificationC1.png}
+
+
+\paragraph{Jeu de tests C}
+
+Les points sont visuellement proche d'une même droite. Si un vecteur $\theta$
+est tel que $\theta X = 1$ pour $Y = 1$, alors pour une grande partie des
+points tels que $Y = 0$, on aura aussi $\theta X = 1$. Pour la régression
+linéaire, la distance au barycentre des points joue énormement (mauvais
+traitement des données bimodales). Même les points exceptionnellement éloignés
+du barycentre ont une importance sur le calcul de theta, alors qu'ils
+représentent plus du bruit. La régression linéaire est très peu robuste.
+
+De même que pour le jeu de données B, IRLS et LDA donnent des résultats tout à
+fait satisfaisants.
+
 
 \end{document}
