@@ -14,7 +14,7 @@ def linear_regression(X, Y):
     b = np.dot(X.T, Y)
     beta = np.dot(a, b)
 
-    return beta[:, 2], u[2, 2]
+    return beta[:2], beta[2]
 
 
 def logistic_regression(X, Y, max_iter=500, ridge=1e-10, verbose=True):
