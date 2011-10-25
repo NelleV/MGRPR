@@ -79,9 +79,10 @@ def LDA(X, Y):
 
     beta = np.dot(S_inv, (m_1 - m_0))
 
-    c = np.dot(np.dot((m_1 - m_0).T, S_inv), m_1 - m_0)
+    c = np.dot(np.dot((m_1).T, S_inv), m_1) - np.dot(np.dot((m_0).T, S_inv),
+    m_0)
     d = np.log(p / (1 - p))
-    gamma = - 1. / 2 * c + d
+    gamma = - 1. / 2 * c - d
     return beta, gamma
 
 
