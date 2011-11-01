@@ -24,10 +24,6 @@ def plot(X, Y, XtA, title="ClassificationA.png"):
     my_members.shape = (my_members.shape[0])
     ax = fig.add_subplot(1, 1, 1)
 
-    ax.plot(XtA[:, 0], XtA[:, 1],
-            'w', markerfacecolor=colors[2], marker = '.')
-
-
     ax.plot(X[my_members, 0], X[my_members, 1],
             'w', markerfacecolor=colors[0], marker = '.')
 

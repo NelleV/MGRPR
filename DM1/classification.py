@@ -94,16 +94,8 @@ def QDA(X, Y):
 
     S_1 = (Y * (X - m_1)).sum(axis=0) / (Y.sum())
     S_0 = ((1 - Y) * (X - m_0)).sum(axis=0) / ((1 - Y).sum())
-    stop
-    S_inv = np.linalg.inv(S)
 
-    beta = np.dot(S_inv, (m_1 - m_0))
-
-    c = np.dot(np.dot((m_1 - m_0).T, S_inv), m_1 - m_0)
-    d = np.log(p / (1 - p))
-    gamma = - 1. / 2 * c + d
-
-    return beta, gamma
+    return p, m_1, m_0, S_1, S_0
 
 
 def error(Yt, Y):
