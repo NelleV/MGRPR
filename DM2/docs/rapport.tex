@@ -1,6 +1,6 @@
 \documentclass{article}
 %\usepackage[latin1]{inputenc}
-\usepackage{graphicx,amssymb,amsmath,amsbsy} % extensions pour maths avancées
+\usepackage{graphicx,amssymb,amsmath,amsbsy,MnSymbol} % extensions pour maths avancées
 \usepackage{graphicx}           % extensions pour figures
 \usepackage[T1]{fontenc}        % pour les charactères accentués 
 \usepackage[utf8]{inputenc} 
@@ -91,5 +91,46 @@ Voici un graphe non orienté $G$ tel qu'il n'existe pas de graphe orienté $G'$ 
 \caption{Graphe non orienté $G$}
 \includegraphics[width=100px]{Ia.png}
 \end{figure}
+
+\section{d-Séparation}
+
+\subsection{Question a}
+
+Soit $G$ un DAG, $G_M$ le graphe moralisé et $\tilde{G}$ son graphe symmétrisé. Soit
+$A$, $B$ et $S$ trois ensembles de noeuds disjoints tels que $A$ et $B$ soient
+séparés par $S$ dans $G_M$.
+
+$A$ et $B$ sont donc séparés par $S$ dans $\tilde{G}$. Cela implique que tous
+les chemins de $A$ vers $B$ sont bloqués par $S$ dans $\tilde{G}$. Donc $A$ et
+$B$ sont d-séparés par $S$ dans $G$.
+
+
+\subsection{Question b}
+
+Soit $A$, $B$, $S$ et $T$ des sous-ensembles de noeuds non vides d'un DAG $G$
+tels que:
+
+\begin{itemize}
+\item $(H1)$: $A$ et $B$ sont d-séparés par $S$
+\item $(H2)$: $A$ et $S$ sont d-séparés par $T$
+\end{itemize}
+
+Faisons l'hypothèse $(H3)$ que $A$ et $B$ ne sont pas d-séparés par $T$. Il
+existe donc un chemin de $A$ vers $B$ non bloqué par $T$. De plus, $A$ et $B$
+sont bloqués par $S$. Donc tous les chemins de $A$ vers $B$ passent par $S$. Il
+existe donc un chemin de $A$ vers $B$ passant par $S$, mais pas par $T$. Ceci
+contredit l'hypothèse que $A$ et $S$ sont d-séparés par $T$.
+
+\subsection{Question c}
+
+\begin{itemize}
+\item L'assertion $X_{\{1, 2\}} \upmodels X_4 | X_3$ est fausse: ${1, 8, 4}$ n'est pas
+bloqué par $4$.
+\item L'assertion $X_{\{1, 2\}} \upmodels X_4 | X_5$ est fausse: le chemin précédant
+n'est pas bloqué par $5$.
+\item L'assertion $X_1 \upmodels X_6 | X_{\{2, 4, 7\}}$ est vraie. Tous les chemins
+de $1$ vers $6$ sont bloqués par $7$.
+\end{itemize}
+
 
 \end{document}
