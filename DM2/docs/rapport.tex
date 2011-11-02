@@ -50,15 +50,15 @@ Montrons que $\mathcal{L}(G) = \mathcal{L}(G')$
 
 Par définition, on a:
 \begin{align}
-\mathcal{L}(G) & = & \{ p | p(x) = \prod_{k = 1}^{n} p(x_k | x_{\pi_k}) \} \\
-	       & = & \{ p | p(x) = A p(x_i | x_{\pi_i}) p(x_j | x_{\pi_j} \}
+\mathcal{L}(G) & = & \{ p \mid p(x) = \prod_{k = 1}^{n} p(x_k \mid x_{\pi_k}) \} \\
+	       & = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_i}) p(x_j \mid x_{\pi_j} \}
 \end{align}
 
-avec $A = \prod_{k \in V \setminus \{i, j\} p[x_k | x_{\pi_k}]}$. De même, on a:
+avec $A = \prod_{k \in V \setminus \{i, j\} p[x_k \mid x_{\pi_k}]}$. De même, on a:
 
 \begin{align}
-\mathcal{L}(G') & = & \{ p | p(x) = \prod_{k = 1}^{n} p(x_k | x_{\pi'_k}) \} \\
-		& = & \{ p | p(x) = A p(x_i | x_{\pi'_i}) p(x_j | x_{\pi'_j} \}
+\mathcal{L}(G') & = & \{ p \mid p(x) = \prod_{k = 1}^{n} p(x_k \mid x_{\pi'_k}) \} \\
+		& = & \{ p \mid p(x) = A p(x_i \mid x_{\pi'_i}) p(x_j \mid x_{\pi'_j} \}
 \end{align}
 
 De plus,
@@ -69,17 +69,17 @@ $$\pi'_j = \pi_j \bigcup \{ i \}$$
 
 On peut donc écrire $(4)$ comme:
 \begin{align}
-\mathcal{L}(G') & = & \{ p | p(x) = A p(x_i | x_{\pi_j}) p(x_j | x_{\pi_j \bigcup \{ i \}}  \} \\
-		& = & \{ p | p(x) = A p(x_i | x_{\pi_j}) p(x_j | x_{\pi_j}, x_i \}
+\mathcal{L}(G') & = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_j}) p(x_j \mid x_{\pi_j \bigcup \{ i \}}  \} \\
+		& = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_j}) p(x_j \mid x_{\pi_j}, x_i \}
 \end{align}
 
-En posant $q = p(. | x_{\pi_j}$, on a par la formule de Bayes $q(x_i)q(x_j | x_i) =  q(x_j)q(x_i | x_j)$.
-D'où $p(x_i | x_{pi_j})p(x_j | x_{\pi_j}, x_i) = p(x_j | x_{pi_j})p(x_i | x_{\pi_j}, x_j)$. Donc
+En posant $q = p(. \mid x_{\pi_j}$, on a par la formule de Bayes $q(x_i)q(x_j \mid x_i) =  q(x_j)q(x_i \mid x_j)$.
+D'où $p(x_i \mid x_{pi_j})p(x_j \mid x_{\pi_j}, x_i) = p(x_j \mid x_{pi_j})p(x_i \mid x_{\pi_j}, x_j)$. Donc
 
 \begin{align}
-\mathcal{L}(G') & = & \{ p | p(x) = A p(x_j | x_{\pi_j}) p(x_i | x_{\pi_j}, x_j) \\
-	        & = & \{ p | p(x) = A p(x_j | x_{\pi_j}) p(x_i | x_{\pi_j \bigcup \{j\}} \} \\
-		& = & \{ p | p(x) = A p(x_j | x_{\pi_j}) p(x_i | x_{\pi_i}) \\
+\mathcal{L}(G') & = & \{ p \mid p(x) = A p(x_j \mid x_{\pi_j}) p(x_i \mid x_{\pi_j}, x_j) \\
+	        & = & \{ p \mid p(x) = A p(x_j \mid x_{\pi_j}) p(x_i \mid x_{\pi_j \bigcup \{j\}} \} \\
+		& = & \{ p \mid p(x) = A p(x_j \mid x_{\pi_j}) p(x_i \mid x_{\pi_i}) \\
 		& = & \mathcal{L}(G)
 \end{align}
 
@@ -124,11 +124,11 @@ contredit l'hypothèse que $A$ et $S$ sont d-séparés par $T$.
 \subsection{Question c}
 
 \begin{itemize}
-\item L'assertion $X_{\{1, 2\}} \upmodels X_4 | X_3$ est fausse: ${1, 8, 4}$ n'est pas
+\item L'assertion $X_{\{1, 2\}} \upmodels X_4 \mid X_3$ est fausse: ${1, 8, 4}$ n'est pas
 bloqué par $4$.
-\item L'assertion $X_{\{1, 2\}} \upmodels X_4 | X_5$ est fausse: le chemin précédant
+\item L'assertion $X_{\{1, 2\}} \upmodels X_4 \mid X_5$ est fausse: le chemin précédant
 n'est pas bloqué par $5$.
-\item L'assertion $X_1 \upmodels X_6 | X_{\{2, 4, 7\}}$ est vraie. Tous les chemins
+\item L'assertion $X_1 \upmodels X_6 \mid X_{\{2, 4, 7\}}$ est vraie. Tous les chemins
 de $1$ vers $6$ sont bloqués par $7$.
 \end{itemize}
 
