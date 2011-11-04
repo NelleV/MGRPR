@@ -63,23 +63,23 @@ avec $A = \prod_{k \in V \setminus \{i, j\} p[x_k \mid x_{\pi_k}]}$. De même, o
 
 De plus,
 
-$$\pi_i = \pi_j \bigcup \{ j \}$$
-$$\pi'_i = \pi_i \setminus \{ j \} = \pi_j$$
-$$\pi'_j = \pi_j \bigcup \{ i \}$$
+$$\pi_j = \pi_i \bigcup \{ i \}$$
+$$\pi'_j = \pi_j \setminus \{ i \} = \pi_i$$
+$$\pi'_i = \pi_i \bigcup \{ j \}$$
 
 On peut donc écrire $(4)$ comme:
 \begin{align}
-\mathcal{L}(G') & = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_j}) p(x_j \mid x_{\pi_j \bigcup \{ i \}}  \} \\
-		& = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_j}) p(x_j \mid x_{\pi_j}, x_i \}
+\mathcal{L}(G') & = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_i \bigcup \{ j \}}) p(x_j \mid x_{\pi_i} )\} \\
+		& = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_i}, x_j) p(x_j \mid x_{\pi_i})\}
 \end{align}
 
-En posant $q = p(. \mid x_{\pi_j}$, on a par la formule de Bayes $q(x_i)q(x_j \mid x_i) =  q(x_j)q(x_i \mid x_j)$.
-D'où $p(x_i \mid x_{pi_j})p(x_j \mid x_{\pi_j}, x_i) = p(x_j \mid x_{pi_j})p(x_i \mid x_{\pi_j}, x_j)$. Donc
+En posant $q = p(. \mid x_{\pi_i})$, on a par la formule de Bayes $q(x_i)q(x_j \mid x_i) =  q(x_j)q(x_i \mid x_j)$.
+D'où $p(x_j \mid x_{\pi_i})p(x_i \mid x_{\pi_i}, x_j) = p(x_i \mid x_{\pi_i})p(x_j \mid x_{\pi_i}, x_i)$. Donc
 
 \begin{align}
-\mathcal{L}(G') & = & \{ p \mid p(x) = A p(x_j \mid x_{\pi_j}) p(x_i \mid x_{\pi_j}, x_j) \\
-	        & = & \{ p \mid p(x) = A p(x_j \mid x_{\pi_j}) p(x_i \mid x_{\pi_j \bigcup \{j\}} \} \\
-		& = & \{ p \mid p(x) = A p(x_j \mid x_{\pi_j}) p(x_i \mid x_{\pi_i}) \\
+\mathcal{L}(G') & = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_i}) p(x_j \mid x_{\pi_i}, x_i) \\
+	        & = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_i}) p(x_j \mid x_{\pi_i \bigcup \{i\}} \} \\
+		& = & \{ p \mid p(x) = A p(x_i \mid x_{\pi_i}) p(x_j \mid x_{\pi_j}) \\
 		& = & \mathcal{L}(G)
 \end{align}
 
@@ -96,30 +96,8 @@ Voici un graphe non orienté $G$ tel qu'il n'existe pas de graphe orienté $G'$ 
 
 \subsection{Question a}
 
-Soit $G$ un DAG, $G_M$ le graphe moralisé et $\tilde{G}$ son graphe symmétrisé. Soit
-$A$, $B$ et $S$ trois ensembles de noeuds disjoints tels que $A$ et $B$ soient
-séparés par $S$ dans $G_M$.
-
-$A$ et $B$ sont donc séparés par $S$ dans $\tilde{G}$. Cela implique que tous
-les chemins de $A$ vers $B$ sont bloqués par $S$ dans $\tilde{G}$. Donc $A$ et
-$B$ sont d-séparés par $S$ dans $G$.
-
 
 \subsection{Question b}
-
-Soit $A$, $B$, $S$ et $T$ des sous-ensembles de noeuds non vides d'un DAG $G$
-tels que:
-
-\begin{itemize}
-\item $(H1)$: $A$ et $B$ sont d-séparés par $S$
-\item $(H2)$: $A$ et $S$ sont d-séparés par $T$
-\end{itemize}
-
-Faisons l'hypothèse $(H3)$ que $A$ et $B$ ne sont pas d-séparés par $T$. Il
-existe donc un chemin de $A$ vers $B$ non bloqué par $T$. De plus, $A$ et $B$
-sont bloqués par $S$. Donc tous les chemins de $A$ vers $B$ passent par $S$. Il
-existe donc un chemin de $A$ vers $B$ passant par $S$, mais pas par $T$. Ceci
-contredit l'hypothèse que $A$ et $S$ sont d-séparés par $T$.
 
 \subsection{Question c}
 
