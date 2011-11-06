@@ -20,7 +20,7 @@ X = np.empty((0, 2))
 for i in range(n_clusters):
     X = np.r_[X, centers[i] + std * np.random.randn(n_points_per_cluster, 2)]
 # Let's shuffle the data
-np.random.shuffle(X) 
+np.random.shuffle(X)
 
 ##############################################################################
 # Compute clustering with Means
