@@ -8,52 +8,14 @@ def _calculate_normal(X, mu, sigma):
     Calculate the probability p of X following normal law
     """
     a = 1. / (2 * np.pi * np.linalg.det(sigma))
-    S_inv = np.linalg.inv(sigma)
+    S_inv = np.linalg.inv(sigma) 
     b = np.diag(np.dot(np.dot((X - mu), S_inv), (X - mu).T))
     p = a * np.exp( -1./2 * b)
     return p
 
 
-def _e_step_1(X, centers, p, pi):
-    """
-    Calculate the M step
-
-    """
-    mindist = np.empty(X.shape[0])
-    mindist.fill(np.infty)
-
-    for center_idx in range(centers.shape[0]):
-        distances = np.sum((X - centers[centers_idx]) ** 2, axis=1)
-        labels[dist < mindist] = center_idx
-        mindst = np.minimum(dist, mindist)
-
-    return labels
-
-
-if __name__ == "__main__":
-    # Generate sample data
-#    np.random.seed(0)
-#
-#    centers = [[1, 1], [-1, -1], [1, -1]]
-#    n_clusters = len(centers)
-#
-#    std = 0.7
-#    n_points_per_cluster = 300
-#    X = np.empty((0, 2))
-#
-#    for i in range(n_clusters):
-#        X = np.r_[X, centers[i] + std * np.random.randn(n_points_per_cluster, 2)]
-#    # Let's shuffle the data
-#    np.random.shuffle(X)
-
-
-    n_clusters = 4
-    X = utils.load_data('EMGaussienne.data')
-
-    max_iterations = 150
-    ridge = 1e-6
-    verbose = True
-
+def calculate_em(X, n_clusters,
+                 diag=False, ridge=1e-6, verbose=False, max_iterations=100):
     n_samples, n_features = X.shape
     # Initialise the data using kmeans
     k_means = KMeans(k=n_clusters)
@@ -81,8 +43,11 @@ if __name__ == "__main__":
             for n in range(n_samples):
                 b = (X[n, :] - mu[i]).reshape((2, 1))
                 a += tau[n, i] * np.dot(b, b.T)
+            if diag:
+                sigma[i, :] = a.mean() / tau[:, i].sum() * np.identity(mu.shape[1])
+            else:
+                sigma[i, :] = a / tau[:, i].sum()
 
-            sigma[i, :] = a / tau[:, i].sum()
 
         tpi = tau.sum(axis=1) / n_samples
         for i in range(n_clusters):
@@ -96,33 +61,7 @@ if __name__ == "__main__":
                 print "break at iterations %d" % j
             break
 
+    return mu, sigma
 
 
-    # Let's plot the results
-
-    import pylab as pl
-
-    x = np.linspace(X.T[0, :].min(), X.T[0, :].max(), num=100)
-    y = np.linspace(X.T[1, :].min(), X.T[1, :].max(), num=100)
-    x, y = np.meshgrid(x, y)
-    xx = np.c_[x.ravel(), y.ravel()]
-
-    fig = pl.figure()
-    colors = ['#4EACC5', '#FF9C34', '#4E9A06', '#00465F']
-    ax = fig.add_subplot(1, 1, 1)
-    for k, col in zip(range(n_clusters), colors):
-
-        my_members = k_means_labels == k
-        cluster_center = mu[k]
-        ax.plot(X[my_members, 0], X[my_members, 1], 'w',
-                markerfacecolor=col, marker='.')
-        ax.plot(cluster_center[0], cluster_center[1], 'o', markerfacecolor=col,
-                                        markeredgecolor='k', markersize=6)
-
-    for k in range(n_clusters):
-        z = _calculate_normal(xx, mu[k, :], sigma[k, :])
-        z = z.reshape(x.shape)
-        pl.contour(x, y, z)
-
-    ax.set_title('Algorithme EM')
 
