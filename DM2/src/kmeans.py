@@ -37,15 +37,15 @@ def k_means(X, k, centers=None, max_iterations=300, ridge=1e-6, verbose=False):
             break
 
     # Now compute final labels
-    distances = euclidean_distances(X, centers)
-    labels = distances.argmin(axis=1)
-    return centers, labels
+    labels, inertia = calculate_labels_inertia(centers, X)
+    return centers, labels, inertia
 
 
-def calculate_labels(centers, X):
+def calculate_labels_inertia(centers, X):
     distances = euclidean_distances(X, centers)
     labels = distances.argmin(axis=1)
-    return labels
+    inertia = distances.min(axis=1).sum()
+    return labels, inertia
 
 
 class KMeans(object):
@@ -54,14 +54,14 @@ class KMeans(object):
 
 
     def fit(self, X, centers=None, ridge=1e-6, verbose=False):
-        self.centers_, labels = k_means(X, self.k,
-                                        centers=centers,
-                                        ridge=ridge,
-                                        verbose=verbose)
-        return labels
+        self.centers_, labels, inertia = k_means(X, self.k,
+                                                 centers=centers,
+                                                 ridge=ridge,
+                                                 verbose=verbose)
+        return labels, inertia
 
     def predict(self, X):
-        return calculate_labels(self.centers_, X)
+        return calculate_labels_inertia(self.centers_, X)
 
 
 

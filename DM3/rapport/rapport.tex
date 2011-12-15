@@ -1,0 +1,135 @@
+\documentclass{article}
+%\usepackage[latin1]{inputenc}
+\usepackage{graphicx,amssymb,amsmath,amsbsy,MnSymbol} % extensions pour maths avancées
+\usepackage{graphicx,mathenv}           % extensions pour figures
+\usepackage[T1]{fontenc}        % pour les charactères accentués 
+\usepackage[utf8]{inputenc} 
+
+\usepackage{stmaryrd} % Pour les crochets d'ensemble d'entier
+\usepackage{float}  % Pour placer les images là ou JE veux.
+
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\argmax}{argmax}
+
+
+\setlength{\parindent}{0.0in}
+\setlength{\parskip}{0.3in}
+\setlength{\topmargin}{-0.4in}
+\setlength{\topskip}{1in}    % between header and text
+\setlength{\textheight}{8in} % height of main text
+\setlength{\textwidth}{4.5in}    % width of text
+\setlength{\oddsidemargin}{1in} % odd page left margin
+\setlength{\evensidemargin}{1in} % even page left margin
+%
+%% Quelques raccourcis clavier :
+\def\slantfrac#1#2{\kern.1em^{#1}\kern-.3em/\kern-.1em_{#2}}
+\def\b#1{\mathbf{#1}}
+\def\bs#1{\boldsymbol{#1}}
+\def\m#1{\mathrm{#1}}
+%
+\newcommand{\greeksym}[1]{{\usefont{U}{psy}{m}{n}#1}}
+\newcommand{\inc}{\mbox{\small\greeksym{d}\hskip 0.05ex}}%
+\pagenumbering{arabic}
+\date{\today}
+\title{DM3: Modèles Graphiques}
+\author{Nelle Varoquaux}
+\begin{document}
+\maketitle
+\tableofcontents{}
+\vfill \eject
+
+\section{Propagation de messages dans les modèles gaussiens}
+
+Soit un modèle Gaussien non orienté de paramètre canonique $\eta \in
+\Re$ et $\Lambda \in \Re^{n * n}$. On considère le cas où le modèle graphe est
+un arche $G = (V, E)$.
+
+\subsection{Propagation de messages sous forme d'exponentielle quadratique}
+
+On sait que:
+
+\begin{align}
+p(x | \eta, \Lambda) & = & \exp\{a + \eta^Tx - \frac{1}{2} x^T \Lambda x\} \\
+		     & = & \exp\{a + \sum_{i=1}^n \eta_{i} x_{i} - \sum_{i=1}^n \frac{1}{2} x_i \lambda_{ij} x_j\}
+\end{align}
+
+De plus,
+\begin{equation}
+p(x | \eta, \Lambda) = \frac{1}{Z} \prod_{i \in \mathcal{V}} \psi_i(x_i) \prod_{i,j \in \mathcal{E}} \psi_{i, j}(x_i, x_j)
+\end{equation}
+
+Sachant que $\lambda_{ij} = 0$ si $(i, j) \notin \mathcal{E}$, on peut en déduire que:
+
+\begin{System}
+\psi_i(x_i) = \exp( \eta_i x_i - \frac{1}{2} x_i ^2\lambda_{ii}) \\
+\psi_{ij}(x_i, x_j) = \exp(- \lambda_{ij} x_i x_j)
+\end{System}
+
+On sait que les messages $\mu_{i \rightarrow j}$ sont définit par:
+
+\begin{align}
+\mu_{j \rightarrow i}(x_i) & = & \int_{x_j \in \Re} \psi_{ij}(x_i, x_j) \psi_j (x_j) \prod_{k \in \mathcal{C}_j} \mu_{k \rightarrow j}(x_j) \\
+			   & = & \int_{x_j \in \Re} \exp(- \lambda_{ij} x_i x_j) \exp(\eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) \prod_{k \in \mathcal{C}_j} \mu_{k \rightarrow j}(x_j)
+\end{align}
+
+Commençons par étudier le cas des feuilles:
+
+\begin{align}
+\mu_{j \rightarrow i}(x_i) & = & \int_{\Re} \exp(- \lambda_{ij} x_i x_j) \exp( \eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) dx_j \\
+			   & = & \int_{\Re} \exp \{ - \frac{1}{2} (\lambda_{jj}x_j^2 + 2x_j(\lambda_{ij}x_i - \eta_j) )\} dx_j \\
+			   & = & \int_{\Re} \exp \{ - \frac{1}{2} (\sqrt{\lambda_{jj}}x_j + \frac{\lambda_{ij}x_i - \eta_j}{\sqrt{\lambda_{jj}}})^2 + \frac{(\lambda_{ij}x_i - \eta_j)^2}{\lambda_{jj}}\} dx_j \\
+			   & = & \exp(\frac{(\lambda_{ij}x_i - \eta_j)^2}{\lambda_{jj}}) \int_{\Re} \exp(\frac{-x^2}{2}) \frac{1}{\sqrt{\lambda_{jj}}}dx \\
+			   & = & 2 * \sqrt{\frac{\pi}{2 * \lambda_{jj}}}\exp(\frac{(\lambda_{ij}x_i - \eta_j)^2}{\lambda_{jj}}) 
+\end{align}
+
+\section{Apprentissage de la structure d'un arbre}
+
+\subsection{Entropie Marginale}
+
+Soit une variable aléatoire discrète $X$ à valeurs dans un ensemble fini
+$\mathcal{X}$. Soit $\eta(x) = p(X =x)$ le vecteur de paramètres. Soit un
+échantillon iid $x^n), n=1, \dots, N$ de taille $N$ de cette variable.
+
+On note $\hat{p}(x)$ la densité empirique définie par $\hat{p}(x) =
+\frac{1}{N} \sum_{n=1}^N \delta(x^n = x)$ et $p_{\eta}(x)$ le maximum de vraisemblance.
+
+On sait que:
+
+\begin{equation}
+\label{minKL-maxlog}
+\min_{\eta} KL(\hat{p}|p_{\eta}) = \max_{\eta} \sum_{n = 1}^N \log p_{\eta}(x^n)
+\end{equation}
+
+Exprimons la divergence de Kullback-Liebler:
+
+\begin{align}
+KL(\hat{p}|p_{\eta}) & = & \sum_{x \in \mathcal{X}} \hat{p}(x) \log(\frac{\hat{p}(x)}{p_{\eta}(x)}) \\
+		     & = & \sum_{x \in \mathcal{X}} \hat{p}(x) (\log(\hat{p}(x)) - \log(p_{\eta}(x))) \\
+		     & = & - NH(x) - \sum_{x \in \mathcal{X}} \hat{p}(x) \log(p_{\eta}(x))
+\end{align}
+
+En utilisant \ref{minKL-maxlog}, on peut écrire:
+
+\begin{align}
+\max_{\eta} \sum_{n = 1}^N \log p_{\eta}(x^n) & = & \min_{\eta} \{- NH(x) - \sum_{x \in \mathcal{X}} \hat{p}(x) \log(p_{\eta}(x))\} \\
+					      & = & - NH(x) - \min_{\eta} \{\sum_{x \in \mathcal{X}} \hat{p}(x) \log(p_{\eta}(x))\} \\
+					      & = & - NH(x)
+\end{align}
+
+\subsection{Entropie jointe et conditionnelle}
+
+Soit deux variables aléatoires discrètes $X$, $Y$ à valeurs dans les ensembles
+finis $\mathcal{X}$ et $\mathcal{Y}$. Soit $\eta(x, y) = p(Y = y | X = x)$ la
+matrice de paramètres de la loi conditionnelle. Soit un échantillon i.i.d.
+$(x^n, y^n), n=1, \dots, N$ de taille $N$. On définit la densité empirique
+$\hat{p}(x, y) = \frac{1}{N} \sum_{n=1}^N \delta(x^n = x) \delta(y^n = y)$.
+
+On pose $q(x) = p(y | x)$
+
+\begin{align}
+KL(\hat{p | p_{\eta}} ) & = & \sum_{(x, y) \in (\mathcal{X}, \mathcal{Y})} \hat{p}(x, y) \log(\frac{\hat{p}(x, y)}{p_{\eta}(x, y)}) \\
+			& = & \sum_{(x, y) \in (\mathcal{X}, \mathcal{Y})} \hat{p}(x, y) (\log(\hat{p}(x, y)) - \log(p_{\eta}(x, y))
+\end{align}
+
+\section{Implémentation - HMM}
+\end{document}

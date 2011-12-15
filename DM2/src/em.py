@@ -14,12 +14,28 @@ def _calculate_normal(X, mu, sigma):
     return p
 
 
+def calculate_log_likelihood(X, mu, sigma, tpi):
+    """
+    Calculate the log likelihood
+    """
+    n_clusters = sigma.shape[0]
+    n_samples = X.shape[0]
+    p = np.zeros((n_clusters, n_samples))
+    for i in range(n_clusters):
+        p[i, :] = _calculate_normal(X, mu[i, :], sigma[i, :])
+    return np.log((p * tpi).sum(axis=0)).sum()
+
+
+
 def calculate_em(X, n_clusters,
-                 diag=False, ridge=1e-6, verbose=False, max_iterations=100):
+                 diag=False, ridge=1e-10, verbose=False, max_iterations=100):
+    """
+    Returns mu, sigma and tpi
+    """
     n_samples, n_features = X.shape
     # Initialise the data using kmeans
     k_means = KMeans(k=n_clusters)
-    k_means_labels = k_means.fit(X.copy())
+    k_means_labels, _ = k_means.fit(X.copy())
     k_means_cluster_centers = k_means.centers_
 
     # OK, so we've got the centers and the labels. Let's now compute the EM
@@ -42,12 +58,15 @@ def calculate_em(X, n_clusters,
             a = 0
             for n in range(n_samples):
                 b = (X[n, :] - mu[i]).reshape((2, 1))
-                a += tau[n, i] * np.dot(b, b.T)
+                if diag:
+                    a += tau[n, i] * np.dot(b.T, b)
+                else:
+                    a += tau[n, i] * np.dot(b, b.T)
+
             if diag:
                 sigma[i, :] = a.mean() / tau[:, i].sum() * np.identity(mu.shape[1])
             else:
                 sigma[i, :] = a / tau[:, i].sum()
-
 
         tpi = tau.sum(axis=1) / n_samples
         for i in range(n_clusters):
@@ -61,7 +80,4 @@ def calculate_em(X, n_clusters,
                 print "break at iterations %d" % j
             break
 
-    return mu, sigma
-
-
-
+    return mu, sigma, tpi
