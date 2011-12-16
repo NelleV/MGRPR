@@ -17,9 +17,9 @@
 \setlength{\topmargin}{-0.4in}
 \setlength{\topskip}{1in}    % between header and text
 \setlength{\textheight}{8in} % height of main text
-\setlength{\textwidth}{4.5in}    % width of text
-\setlength{\oddsidemargin}{1in} % odd page left margin
-\setlength{\evensidemargin}{1in} % even page left margin
+\setlength{\textwidth}{6in}    % width of text
+\setlength{\oddsidemargin}{0.5in} % odd page left margin
+\setlength{\evensidemargin}{0.5in} % even page left margin
 %
 %% Quelques raccourcis clavier :
 \def\slantfrac#1#2{\kern.1em^{#1}\kern-.3em/\kern-.1em_{#2}}
@@ -77,12 +77,31 @@ Commençons par étudier le cas des feuilles:
 \begin{align}
 \mu_{j \rightarrow i}(x_i) & = & \int_{\Re} \exp(- \lambda_{ij} x_i x_j) \exp( \eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) dx_j \\
 			   & = & \int_{\Re} \exp \{ - \frac{1}{2} (\lambda_{jj}x_j^2 + 2x_j(\lambda_{ij}x_i - \eta_j) )\} dx_j \\
-			   & = & \int_{\Re} \exp \{ - \frac{1}{2} (\sqrt{\lambda_{jj}}x_j + \frac{\lambda_{ij}x_i - \eta_j}{\sqrt{\lambda_{jj}}})^2 + \frac{(\lambda_{ij}x_i - \eta_j)^2}{\lambda_{jj}}\} dx_j \\
-			   & = & \exp(\frac{(\lambda_{ij}x_i - \eta_j)^2}{\lambda_{jj}}) \int_{\Re} \exp(\frac{-x^2}{2}) \frac{1}{\sqrt{\lambda_{jj}}}dx \\
-			   & = & 2 * \sqrt{\frac{\pi}{2 * \lambda_{jj}}}\exp(\frac{(\lambda_{ij}x_i - \eta_j)^2}{\lambda_{jj}}) 
+			   & = & \int_{\Re} \exp \{ - \frac{1}{2} (\sqrt{\lambda_{jj}}x_j + \frac{\lambda_{ij}x_i - \eta_j}{\sqrt{\lambda_{jj}}})^2 + \frac{(\lambda_{ij}x_i - \eta_j)^2}{2\lambda_{jj}}\} dx_j \\
+			   & = & \exp(\frac{(\lambda_{ij}x_i - \eta_j)^2}{2\lambda_{jj}}) \int_{\Re} \exp(\frac{-x^2}{2}) \frac{1}{\sqrt{\lambda_{jj}}}dx \\
+			   & = & 2 \sqrt{\frac{\pi}{2 \lambda_{jj}}}\exp(\frac{(\lambda_{ij}x_i - \eta_j)^2}{2\lambda_{jj}})
 \end{align}
 
+Nous obtenons donc bien une expression du message sous forme d'exponentielle quadratique.
+
+Faisons l'hypothèse que les messages $\mu_{k \rightarrow j}$ peuvent se mettre
+sous la forme $\mu_{k \rightarrow j}(x_j) = e^{\alpha_{k \rightarrow j} x_j^2 +
+\beta_{k \rightarrow i} x_j^2  + \gamma_{k \rightarrow j}}$.
+
+Nous avons déjà démontré que cela était vrai pour les racines. Faisons le maintenant pour le cas générale.
+On a donc:
+\begin{align}
+\mu_{j \rightarrow i}(x_i) & = & \int_{x_j \in \Re} \exp(- \lambda_{ij} x_i x_j) \exp(\eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) \prod_{k \in \mathcal{C}_j} \mu_{k \rightarrow j}(x_j) \\
+			   & = & \int_{x_j \in \Re} \exp(- \lambda_{ij} x_i x_j) + \eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) \prod_{k \in \mathcal{C}_j} e^{\alpha_{k \rightarrow j} x_j^2 + \beta_{k \rightarrow i} x_j^2  + \gamma_{k \rightarrow j}} dx_j \\
+			   & = & \int_{x_j \in \Re} e^{a x_j^2 + b x_j  + c} dx_j
+\end{align}
+
+Dont le résultat peut s'exprimer sous la forme d'une exponentielle de quadratique.
+
+\subsection{Calcul de $\mu$ et $\mathbb{E}[X_s, X_t]_{s, t \in E}$}
+
 \section{Apprentissage de la structure d'un arbre}
+
 
 \subsection{Entropie Marginale}
 
@@ -130,6 +149,111 @@ On pose $q(x) = p(y | x)$
 KL(\hat{p | p_{\eta}} ) & = & \sum_{(x, y) \in (\mathcal{X}, \mathcal{Y})} \hat{p}(x, y) \log(\frac{\hat{p}(x, y)}{p_{\eta}(x, y)}) \\
 			& = & \sum_{(x, y) \in (\mathcal{X}, \mathcal{Y})} \hat{p}(x, y) (\log(\hat{p}(x, y)) - \log(p_{\eta}(x, y))
 \end{align}
+
+\subsection{Question 3}
+
+Considérons maintenant $P$ variables aléatoires $X_1, \dots, X_P$ à support
+fini $\mathcal{X}_1, \dots, \mathcal{X}_P$. On considère $N$ observations
+i.i.d. de ces $P$ variables, $(x_p^{n}), p = 1, \dots, P, n = 1, \dots, N$. On
+note $\hat{p}(x_1, \dots, x_P)$ la densité empirique définie par:
+
+\begin{equation}
+\hat{p}(x_1, \dots, x_P) = \frac{1}{N} \sum_{n=1}^{N} \delta(x_1^n = x_1) \dots \delta(x_P^n = x_P)
+\end{equation}
+
+Soit un arbre orienté $T$ couvrant à $P$ sommets. Cette arbre a au plus un
+parent par sommet. En notant $r$, la racine de l'arbre, et $\pi_i$ les voisins
+de $i$, on peut donc exprimer la loi $p(x_1, \dots, x_P)$ comme:
+
+\begin{equation}
+p(x_1, \dots, x_P) = \prod_{p \in V} p(x_p | x_{\pi_p})
+\end{equation}
+
+Or, $\pi_i$ a au plus un élément. D'où:
+
+\begin{equation}
+p(x_1, \dots, x_P) = \prod_{p \in V}p(x_p | x_{p_j})
+\end{equation}
+
+où $x_{p_j}$ est l'unique parent de $x_p$ ou $\varnothing$ si celui-ci n'a pas
+de parent.
+
+En suivant cette convention de notation, sachant que l'on peut maximiser les
+terms du maximum de vraisemblance indépendament les uns des autres:
+
+\begin{align}
+l(T) & = & \max\sum_{p \in V} \log p(x_p | x_{p_j}) \\
+     & = & \sum_{p \in V} \max \log p(x_p | x_{p_j}) \\
+     & = & \sum_{p \in V} N(H(X_p) - H(X_p, X_{\pi_p(T)}) \\
+     & = & N \sum_{p \in V} H(X_p) - H(X_p, X_{\pi_p(T)})
+\end{align}
+
+\subsection{Question 4 - Information Mutuelle Empirique}
+
+% TODO plus détaillé les calculs, entre autre au niveau des sommes sur x de p^(x, y) = p^(y)
+
+\begin{align}
+KL(\hat{p}(x, y) || \hat{p}(x)\hat{p}(y)) & = & \sum_{x, y} \hat{p}(x, y) \log \frac{\hat{p}(x, y)}{\hat{p}(x)\hat{p}(y)} \\
+					  & = & \sum_{x, y} \hat{p}(x, y) \log \hat{p}(x, y) - \sum_{x, y} \hat{p}(x, y) \log \hat{p}(x) - \sum_{x, y} \hat{p}(x, y) \log \hat{p}(y) \\
+					  & = & \sum_{x, y} \hat{p}(x, y) \log \hat{p}(x, y) - \sum_{x} \hat{p}(x) \log \hat{p}(x) - \sum_{y} \hat{p}(y) \log \hat{p}(y) \\
+					  & = & -H(X, Y) + H(X) + H(Y) \\
+					  & = & I(X || Y)
+\end{align}
+
+
+Montrons maitenant qu'une divergence de Kullback-Liebler est toujours positive ou nulle.
+
+Soit $q$ et $p$.
+
+\begin{align}
+KL(p || q) & = & \sum_{\mathcal{X}} \{ \frac{p(x)}{q(x)} \log \frac{p(x)}{q(x)} \} q(x) \\
+	   & = & \mathbb{E}_q [\frac{p(x)}{q(x)} \log \frac{p(x)}{q(x)}]
+\end{align}
+
+
+On pose $f: x \rightarrow x \log(x)$
+$f$ est convexe. On peut donc utiliser Jensen:
+
+\begin{align}
+KL(p || q) & = & \mathbb{E}_q [f(\frac{p(x)}{q(x)})] \\
+	   & \geq & f( \mathbb{E}_q[\frac{p(x)}{q(x)}] \\
+	   & \geq & f(1) \\
+	   & \geq & 0
+\end{align}
+
+\subsection{}
+
+\begin{align}
+l(T) & = & N \sum_{p=1}^N \{H_{X_{\pi(T)}} - H(X_p, X_{\pi_p(T)}\} \\
+     & = & N \sum_{p=1}^N \{- H(X_p, X_{\pi_{p(T)}}) + H(X_{\pi_{p(T)}}) + H(X_p) - H(X_p)\} \\
+     & = & N \sum_{p=1}^N I(X_p, X_{\pi_{p(T)}}) - N \sum_{p=1}^N H(X_p)
+\end{align}
+
+
+Le deuxième terme de la log vraisemblance est indépendante de la structure du
+graphe. Pour maximiser $l(T)$ par rapport à l'arbre $T$, il suffit donc de
+maximiser le premier terme du graphe. On remarque par ailleurs que cette
+maximisation est indépendante de l'orientation du graphe: seule la présence
+d'une arête importe.
+
+On retrouve ici la problématique de l'arbre couvrant de poids maximal. Grâce à
+l'information mutuelle entre deux points, calculable avec les densités, on peut
+définir un coût entre chaque arête d'un arbre $G$, à $P$ sommets, et $P(P - 1)$
+arêtes. Ces coûts permettent de trouver un arbre couvrant de poids maximal, à
+savoir un arbre couvrant (ie, un arbre qui connecte tous les sommets du graphe
+$G$ ensemble) dont le poids est supérieur ou égal à celui de tous les autres
+graphes couvrants du graphe. L'arbre couvrant maximal est l'arbre ayant la
+structure maximisant le maximum de vraisemblance.
+
+Il existe différents algorithmes permettant de calculer un tel arbre, le plus
+connu étant certainement l'algorithme de Kruskal (généralement utilisé pour
+calculer l'arbre couvrant minimal). Cet algorithme consiste à ranger les
+informations mutuelles par ordre décroissant, c'est-à-dire les arêtes par poids
+décroissants, et d'ajouter les arêtes à l'arbre couvrant tant que cet ajout ne
+fait pas apparaître de cycle. On obtient ainsi un arbre non orienté. On peut
+ensuite choisir une racine, afin de l'orienter.
+
+La complexité d'un tel algorithme est $P\log(P)$.
 
 \section{Implémentation - HMM}
 \end{document}
