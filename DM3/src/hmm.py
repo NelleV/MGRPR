@@ -10,8 +10,6 @@ gmm = GMM(n_components=K)
 gmm.fit(data)
 
 a = 0.25 * np.ones((K, K))
-a[0] = 0.21
-a[2] = 0.29
 
 pi = 0.5  # Valeur bidon
 mu = gmm.means.copy()
