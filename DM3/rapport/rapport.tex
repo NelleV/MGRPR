@@ -253,7 +253,63 @@ décroissants, et d'ajouter les arêtes à l'arbre couvrant tant que cet ajout n
 fait pas apparaître de cycle. On obtient ainsi un arbre non orienté. On peut
 ensuite choisir une racine, afin de l'orienter.
 
-La complexité d'un tel algorithme est $P\log(P)$.
+
+%% FIXME
+La complexité d'un tel algorithme est $P(P-1)\log(P) + PN$. Il faut une
+complexité de $PN$ pour calculer les informations mutelles, et $P(P-1)\log(P)$
+pour l'algorithme de Kruskal.
 
 \section{Implémentation - HMM}
+\subsection{Equations d'estimation EM}
+
+\begin{equation}
+p(q, y, \theta) =  \prod_{i = 1}^4 \pi_i {q_0^i} \prod_{t = 0}^{T - 2} \prod_{i, j} a_{ij}^{q_t^i q_{t + 1}^j} \prod_{t = 0}^{T - 1} \prod_{i = 1}^{4} \mathcal{N}(\mu_i, \Sigma_i)(y_t)^{q_t^i}
+\end{equation}
+
+\begin{align}
+l(q, y, \theta) & = & \sum_{i = 1}^4 q_0^i \ln \pi_i + \sum_{t = 0}^{T - 2} \sum_{i, j} q_t^i q_{t + 1}^j \ln a_{ij} + \sum_{t = 0}^{T - 1} \sum_{i = 1}^4 q_t^i \ln(\mathcal{N}(\mu_i, \Sigma_i)(y_t))
+\end{align}
+
+\begin{itemize}
+\item En maximisant par $\pi_i$ \\
+  \begin{equation}
+  \pi_i^{(n + 1)} = \frac{q_0^i}{\sum_{j = 1}^4 q_0^j} = q_0^i
+  \end{equation}
+
+\item En maximisant par $a_{ij}$ \\
+  \begin{equation}
+  a_{ij}^{(n + 1)} = \frac{\sum_{t = 0}^{T - 2} q_t^i q_{t + 1}^j}{\sum_{j = 1}^4 \sum_{t = 0}^{T - 2}q_t^i q_{t + 1}^j}
+  \end{equation}
+
+\item En maximisant par $\mu_i$: \\
+  le terme de $l(q, y, \theta)$ dépendant de $\mu_i$ et $\Sigma_i$ est le suivant:
+  \begin{align}
+  \sum_{i = 1}^{4} \sum_{t = 0}^{T - 1} q_t^i \{ - \ln(2 \pi) - \frac{1}{2} \ln |\Sigma_i| - (y_t - \mu_i) \Sigma_i^{-1} (y_t - \mu_i)^T\}
+  \end{align}
+
+  On obtient donc:
+
+  \begin{align}
+  \mu_i^{n + 1} = \frac{\sum_{t = 0}^{T - 1} q_t^i y_t}{\sum_{t = 0}^{T - 1}q_t^i}
+  \end{align}
+
+\item En maximisant par $\Sigma_i$: \\
+  \begin{equation}
+    \Sigma_i^{n + 1} = \frac{\sum_{t = 0}^{T - 1}q_t^i (y_t - \mu_i) (y_t - \mu_i)^T}{\sum_{t = 0}^{T - 1}q_t^i}
+  \end{equation}
+\end{itemize}
+
+
+En réexprimant avec $\gamma(q_t) = p(q_t |y_0, y_1, \dots, y_T)$ et $\xi(q_t, q_{t + 1}) = p(q_t, q_{t + 1} | y)$:
+
+\begin{System}
+\pi_i^{n + 1} = \gamma_0 \\
+\\
+a_{ij}^{n + 1} = \frac{\sum_{t = 0}^{T - 2} \xi_{t, t + 1}^{i, j}}{\sum_{t = 0}^{T - 1} \gamma_t^i} \\
+\\
+\mu_i^{(n + 1)} =  \frac{\sum_{t = 0}^{T - 1} \gamma_t^i y_t}{\sum_{t = 0}^{T - 1}\gamma_t^i} \\
+\\
+\Sigma_i^{n + 1} = \frac{\sum_{t = 0}^{T - 1}\gamma_t^i (y_t - \mu_i) (y_t - \mu_i)^T}{\sum_{t = 0}^{T - 1}\gamma_t^i}
+
+\end{System}
 \end{document}
