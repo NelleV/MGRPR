@@ -1,6 +1,6 @@
 import numpy as np
 
-from sklearn.mixture import GMM
+from sklearn.mixture import GMM, lmvnpdf
 from utils import load_data
 
 data = load_data('EMGaussienne.data')
@@ -63,7 +63,7 @@ def compute_alpha(data, pi, mu, sigma):
             alpha[i, :] /= alpha_norm[i]
         else:
             for k in range(K):
-                alpha[i, k] = np.dot(alpha[i - 1, :] * a[:, k], p)
+                alpha[i, k] = np.dot(alpha[i - 1, :], a[:, k]) * p[k]
             alpha_norm[i] = alpha[i, :].sum()
             alpha[i, :] /= alpha_norm[i]
     return alpha
@@ -77,15 +77,21 @@ def e_step(data, a, pi, mu, sigma):
 
     alpha = compute_alpha(data, pi, mu, sigma)
     gamma = compute_gamma(a, alpha)
-    xi = np.zeros((len(q) - 1, K, K))
-    for i, element in enumerate(q[:-1]):
+    xi = compute_xi(data, mu, sigma, alpha, gamma)
+
+    return alpha, beta, gamma, xi
+
+
+def compute_xi(data, mu, sigma, alpha, gamma):
+    xi = np.zeros((len(data) - 1, K, K))
+    for i, element in enumerate(data[:-1]):
         p = np.array([_calculate_normal(data[i + 1, :], mu[j], sigma[j])
                     for j in range(K)])
         for k in range(K):
             for g in range(K):
                 xi[i, k, g] = alpha[i, k] * gamma[i + 1, g] * p[g] * a[k, g]
                 xi[i, k, g] /= gamma[i + 1, g]
-    return alpha, beta, gamma, xi
+    return xi
 
 
 # Estimation des parametres !
@@ -110,4 +116,12 @@ max_iter = 1
 for i in range(max_iter):
     alpha, beta, gamma, xi = e_step(data, a, pi, mu, sigma)
     pi, a, gamma, mu, sigma = m_step(gamma, xi, data, sigma, mu, a, pi)
+    if i == 0:
+        old_gamma = gamma.copy()
+    else:
+        if ((gamma - old_gamma) ** 2).sum() < 1e6:
+            print "break at iteration %d" % i
+            break
 q = gamma.argmax(axis=1)
+a = lmvnpdf(data, mu, sigma, 'full')
+b = lmvnpdf(data, gmm.means, gmm.covars, 'full')
