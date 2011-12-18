@@ -1,15 +1,21 @@
 import numpy as np
 
+from sklearn.mixture import GMM
 from utils import load_data
 
 data = load_data('EMGaussienne.data')
-data = data[:100]
 K = 4
+
+gmm = GMM(n_components=K)
+gmm.fit(data)
+
 a = 0.25 * np.ones((K, K))
 a[0] = 0.21
 a[2] = 0.29
 
-T = 100
+pi = 0.5  # Valeur bidon
+mu = gmm.means.copy() 
+sigma = gmm.covars
 
 
 def _calculate_normal(X, mu, sigma):
@@ -23,18 +29,6 @@ def _calculate_normal(X, mu, sigma):
     return p
 
 
-pi = 0.5  # Valeur bidon
-mu = [np.array([0, 1]),
-      np.array([1, 1]),
-      np.array([1, 0]),
-      np.array([0, 2])]
-
-sigma = [0.6 * np.identity(2),
-         np.identity(2),
-         np.identity(2),
-         np.identity(2)]
-
-
 def e_step(data, a, pi, mu, sigma):
     """
     """
@@ -42,6 +36,7 @@ def e_step(data, a, pi, mu, sigma):
     alpha = np.zeros((len(q), K))
     alpha_norm = np.zeros((len(q), 1))
     beta = np.zeros((len(q), K))
+    gamma = np.zeros((len(q), K))
 
     for i, element in enumerate(q):
         p = np.array([_calculate_normal(data[i, :], mu[j], sigma[j])
@@ -66,14 +61,24 @@ def e_step(data, a, pi, mu, sigma):
 
         if i == 0:
             beta[len(q) - 1 - i, :] = 0.25, 0.25, 0.25, 0.25
-            #beta[len(q) - 1 - i, :] /= alpha_norm[len(q) - 1 - i]
+            beta[len(q) - 1 - i, :] /= alpha_norm[len(q) - 1 - i]
         else:
             for k in range(K):
                 beta[len(q) - 1 - i, k] = np.dot(beta[len(q) - i] * a[:, k], p)
-            #beta[len(q) - 1 - i, :] *= alpha_norm[len(q) - 1 - i]
+            beta[len(q) - 1 - i, :] /= alpha_norm[len(q) - 1 - i]
 
-    gamma = alpha * beta
-    gamma /= gamma.sum(axis=1).reshape((len(gamma), 1))[-1]
+    for i, element in enumerate(q):
+        p = np.array([_calculate_normal(data[len(q) - 1 - i, :],
+                                        mu[j],
+                                        sigma[j])
+                        for j in range(K)])
+        if i == 0:
+            gamma[len(q) - 1 - i] = alpha[len(q) - 1 - i]
+        else:
+            for k in range(K):
+                b = alpha[len(q) - i] * a[:, k]
+                gamma[len(q) - 1 - i, k] = np.dot(b / b.sum(),
+                                                  gamma[len(q) - i])
 
     xi = np.zeros((len(q) - 1, K, K))
     for i, element in enumerate(q[:-1]):
@@ -103,6 +108,8 @@ def m_step(gamma, xi, data, sigma, mu, a, pi):
         mu[i] /= gamma[:, i].sum()
     return pi, a, gamma, mu, sigma
 
-max_iter = 2
-alpha, beta, gamma, xi = e_step(data, a, pi, mu, sigma)
-pi, a, gamma, mu, sigma = m_step(gamma, xi, data, sigma, mu, a, pi)
+
+max_iter = 10
+for i in range(max_iter):
+    alpha, beta, gamma, xi = e_step(data, a, pi, mu, sigma)
+    pi, a, gamma, mu, sigma = m_step(gamma, xi, data, sigma, mu, a, pi)
