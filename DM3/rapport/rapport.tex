@@ -42,7 +42,7 @@
 
 Soit un modèle Gaussien non orienté de paramètre canonique $\eta \in
 \Re$ et $\Lambda \in \Re^{n * n}$. On considère le cas où le modèle graphe est
-un arche $G = (V, E)$.
+un arbre $G = (V, E)$.
 
 \subsection{Propagation de messages sous forme d'exponentielle quadratique}
 
@@ -65,7 +65,7 @@ Sachant que $\lambda_{ij} = 0$ si $(i, j) \notin \mathcal{E}$, on peut en dédui
 \psi_{ij}(x_i, x_j) = \exp(- \lambda_{ij} x_i x_j)
 \end{System}
 
-On sait que les messages $\mu_{i \rightarrow j}$ sont définit par:
+On sait que les messages $\mu_{i \rightarrow j}$ sont définis par:
 
 \begin{align}
 \mu_{j \rightarrow i}(x_i) & = & \int_{x_j \in \Re} \psi_{ij}(x_i, x_j) \psi_j (x_j) \prod_{k \in \mathcal{C}_j} \mu_{k \rightarrow j}(x_j) \\
@@ -88,20 +88,37 @@ Faisons l'hypothèse que les messages $\mu_{k \rightarrow j}$ peuvent se mettre
 sous la forme $\mu_{k \rightarrow j}(x_j) = e^{\alpha_{k \rightarrow j} x_j^2 +
 \beta_{k \rightarrow i} x_j^2  + \gamma_{k \rightarrow j}}$.
 
-Nous avons déjà démontré que cela était vrai pour les racines. Faisons le maintenant pour le cas générale.
+Nous avons déjà démontré que cela était vrai pour les racines. Faisons le maintenant pour le cas général.
 On a donc:
 \begin{align}
 \mu_{j \rightarrow i}(x_i) & = & \int_{x_j \in \Re} \exp(- \lambda_{ij} x_i x_j) \exp(\eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) \prod_{k \in \mathcal{C}_j} \mu_{k \rightarrow j}(x_j) \\
-			   & = & \int_{x_j \in \Re} \exp(- \lambda_{ij} x_i x_j) + \eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) \prod_{k \in \mathcal{C}_j} e^{\alpha_{k \rightarrow j} x_j^2 + \beta_{k \rightarrow i} x_j^2  + \gamma_{k \rightarrow j}} dx_j \\
-			   & = & \int_{x_j \in \Re} e^{a x_j^2 + b x_j  + c} dx_j
+			   & = & \int_{x_j \in \Re} \exp(- \lambda_{ij} x_i x_j) + \eta_j x_j - \frac{1}{2} x_j ^2\lambda_{jj}) \prod_{k \in \mathcal{C}_j} e^{\alpha_{k \rightarrow j} x_j^2 + \beta_{k \rightarrow j} x_j^2  + \gamma_{k \rightarrow j}} dx_j \\
+			   & = & \int_{x_j \in \Re} \exp \{ \(-\frac{1}{2} \lambda_{jj} + \sum_{k \in\mathcal{C}_j} \alpha_{k \rightarrow j}\) x_j^2  + \(\eta_j - \lambda_{ij}x_i + \sum_{k \in \mathcal{C}_j} \beta_{k \rightarrow j} \) x_j + \sum_{k \in \mathcal{C}_j} \gamma_{k \rightarrow j} \} dx_j
 \end{align}
 
 Dont le résultat peut s'exprimer sous la forme d'une exponentielle de quadratique.
 
+De plus, avec $a < 0$:
+
+\begin{align}
+\int_{\Re} e^{ax^2 + bx + c}dx & = & \int_{\Re} e^{a(x + \frac{b}{2a})^2 - \frac{b^2}{4a} + c}dx \\
+			         & = & e^{- \frac{b^2}{4a} + c} \int_{\Re} e^{ a(x + \frac{b}{2a})^2}dx \\
+				 & = & e^{- \frac{b^2}{4a} + c} \sqrt{- \frac{\pi}{a}}
+\end{align}
+
+\begin{align}
+\mu_{j \rightarrow i}(x_i) & = & \sqrt{\frac{\pi}{\frac{1}{2} \lambda_{jj} - \sum_{k \in \mathcal{C}_j}\alpha_{k \rightarrow j}}} e^{- \frac{\(- \lambda_{ji} x_i + \sum_{k \in \mathcal{C}_j}\beta_{k \rightarrow j}  + \eta_j \)^2}{-2 \lambda_{jj} + 4 \sum_{k \in \mathcal{C}_j} \alpha_{k \rightarrow j}}}
+\end{align}
+
 \subsection{Calcul de $\mu$ et $\mathbb{E}[X_s, X_t]_{s, t \in E}$}
 
-\section{Apprentissage de la structure d'un arbre}
+En notant $\mu_{j \rightarrow i}$ les messages, et $\nu_{k \rightarrow i} = \prod_{t \in \mathcal{N}(i) \ k} \mu_{t \rightarrow i}(x_i)$, on peut calculer les marginales $p(x_i) = \nu_{i \rightarrow k} \mu_{k \rightarrow i}$. Les deux expressions précédentes étant des exponentielles de quadratique et $p(x_i)$ étant gaussien, nous pouvons identifier $\mu$. De même pour $(\mathbb{E}[X_s X_t])_{\{s, t\} \in E}$
 
+\subsection{Complexité algorithmique}
+
+La complexité de l'algorithme dans le cas générale est $NP$-dur. Cependant, pour les arbres, celui-ci est linéaire en $n$, ce qui rends l'algorithm PM très avantageux pour calculer $\mu$, puisqu'il faut seulement deux passes sur le graphe pour calculer toutes les marginales.
+
+\section{Apprentissage de la structure d'un arbre}
 
 \subsection{Entropie Marginale}
 
@@ -143,11 +160,22 @@ matrice de paramètres de la loi conditionnelle. Soit un échantillon i.i.d.
 $(x^n, y^n), n=1, \dots, N$ de taille $N$. On définit la densité empirique
 $\hat{p}(x, y) = \frac{1}{N} \sum_{n=1}^N \delta(x^n = x) \delta(y^n = y)$.
 
-On pose $q(x) = p(y | x)$
+On sait que:
 
 \begin{align}
-KL(\hat{p | p_{\eta}} ) & = & \sum_{(x, y) \in (\mathcal{X}, \mathcal{Y})} \hat{p}(x, y) \log(\frac{\hat{p}(x, y)}{p_{\eta}(x, y)}) \\
-			& = & \sum_{(x, y) \in (\mathcal{X}, \mathcal{Y})} \hat{p}(x, y) (\log(\hat{p}(x, y)) - \log(p_{\eta}(x, y))
+\hat{\eta}(x, y) & = & \frac{\sum_{n = 1}^{N} \delta(x^n = x) \delta(y^n =
+y)}{\sum_{n = 1}^N \delta(x^n = x)}
+\end{align}
+
+On peut donc écrire
+
+\begin{align}
+\sum_{n = 1}^N \log p_{\eta}(x^n) & = & \sum_{n = 1}^N \log \( \frac{\frac{1}{N}\sum_{i = 1}^N \delta(x^n = x^i) \delta(y^n = y^i)}{\frac{1}{N} \sum_{i = 1}^N\delta(x^n = x^i)} \) \\
+				  & = & \sum_{n = 1}^N \{ \log \( \frac{1}{N} \sum_{i = 1}^N \delta(x^n = x^i) \delta(y^n = y^i) \) - \log \(\frac{1}{N} \sum_{i = 1}^N \delta(x^n = x^i)\) \} \\
+				  & = & \sum_{y \in \mathcal{Y}} \sum_{x \in \mathcal{X}} \sum_{n = 1}^N \delta(x^n =x) \delta(y^n = y) \{ \log \( \frac{1}{N} \sum_{i = 1}^N \delta(x = x^i) \delta(y = y^i) \) - \log \(\frac{1}{N} \sum_{i = 1} \delta(x = x^i)\) \} \\
+				  & = & - N H(X, Y) - \sum_{y \in \mathcal{Y}} \sum_{x \in \mathcal{X}} \[ \(\sum_{n = 1}^N \delta(x^n = x)\delta(y^n = y) \) \log \( \frac{1}{N} \sum_{i = 1}^N \delta(x = x^i) \) \] \\
+				  & = & - N H(X, Y) - \sum_{x \in \mathcal{X}} \[ \(\sum_{n = 1}^N \delta(x^n = x) \) \log \( \frac{1}{N} \sum_{i = 1}^N \delta(x = x^i )\)\] \\
+				  & = & - N H(X, Y) + N(X)
 \end{align}
 
 \subsection{Question 3}
@@ -161,9 +189,9 @@ note $\hat{p}(x_1, \dots, x_P)$ la densité empirique définie par:
 \hat{p}(x_1, \dots, x_P) = \frac{1}{N} \sum_{n=1}^{N} \delta(x_1^n = x_1) \dots \delta(x_P^n = x_P)
 \end{equation}
 
-Soit un arbre orienté $T$ couvrant à $P$ sommets. Cette arbre a au plus un
+Soit un arbre orienté $T$ couvrant à $P$ sommets. Cet arbre a au plus un
 parent par sommet. En notant $r$, la racine de l'arbre, et $\pi_i$ les voisins
-de $i$, on peut donc exprimer la loi $p(x_1, \dots, x_P)$ comme:
+de $i$, on peut exprimer la loi $p(x_1, \dots, x_P)$ comme:
 
 \begin{equation}
 p(x_1, \dots, x_P) = \prod_{p \in V} p(x_p | x_{\pi_p})
@@ -179,7 +207,7 @@ où $x_{p_j}$ est l'unique parent de $x_p$ ou $\varnothing$ si celui-ci n'a pas
 de parent.
 
 En suivant cette convention de notation, sachant que l'on peut maximiser les
-terms du maximum de vraisemblance indépendament les uns des autres:
+termes du maximum de vraisemblance indépendament les uns des autres:
 
 \begin{align}
 l(T) & = & \max\sum_{p \in V} \log p(x_p | x_{p_j}) \\
@@ -249,18 +277,18 @@ Il existe différents algorithmes permettant de calculer un tel arbre, le plus
 connu étant certainement l'algorithme de Kruskal (généralement utilisé pour
 calculer l'arbre couvrant minimal). Cet algorithme consiste à ranger les
 informations mutuelles par ordre décroissant, c'est-à-dire les arêtes par poids
-décroissants, et d'ajouter les arêtes à l'arbre couvrant tant que cet ajout ne
+décroissants, et à ajouter les arêtes à l'arbre couvrant tant que cet ajout ne
 fait pas apparaître de cycle. On obtient ainsi un arbre non orienté. On peut
 ensuite choisir une racine, afin de l'orienter.
 
 
 %% FIXME
 La complexité d'un tel algorithme est $P(P-1)\log(P) + PN$. Il faut une
-complexité de $PN$ pour calculer les informations mutelles, et $P(P-1)\log(P)$
+complexité de $PN$ pour calculer les informations mutuelles, et $P(P-1)\log(P)$
 pour l'algorithme de Kruskal.
 
 \section{Implémentation - HMM}
-\subsection{Equations d'estimation EM}
+\subsection{Équations d'estimation EM}
 
 \begin{equation}
 p(q, y, \theta) =  \prod_{i = 1}^4 \pi_i {q_0^i} \prod_{t = 0}^{T - 2} \prod_{i, j} a_{ij}^{q_t^i q_{t + 1}^j} \prod_{t = 0}^{T - 1} \prod_{i = 1}^{4} \mathcal{N}(\mu_i, \Sigma_i)(y_t)^{q_t^i}
